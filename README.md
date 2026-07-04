@@ -17,7 +17,7 @@ And backend is now running on http://localhost:8000
 
 ### direct python
 create virtual environment
-`python -m venv .venv`
+- `python -m venv .venv`
 
 For Command Prompt, use .venv\Scripts\activate.bat. For PowerShell, use .venv\Scripts\Activate.ps1
 
@@ -26,17 +26,18 @@ Install dependencies using pip install -r requirements.txt
 add .env with proper environment variables
 
 do `fastapi run`
+
 all set
 
 
 ### frontend 
 cd into the frontend 
 
-python -m http.server 3000
+- `python -m http.server 3000`
 in frontend folder runthis and open the `http://localhost:3000`
 
 ### api we provide
-````
+
 ```bash
 curl -X POST http://localhost:8000/api/classify/batch/ -H 'Content-Type: application/json' -H 'Accept: application/json' -d '{
   "messages":
