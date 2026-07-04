@@ -1,9 +1,12 @@
-from typing import Literal
+from typing import Annotated, Literal
 from pydantic import BaseModel, Field
+from settings import setting
 
 
-class ClassifyMessage(BaseModel):
-    message: str
+class ClassifyMessages(BaseModel):
+    messages: Annotated[
+        list[str], Field(min_length=1, max_length=setting.MAX_BATCH_LENGHT)
+    ]
 
 
 class TriageOutput(BaseModel):

@@ -1,56 +1,52 @@
-import os
-from fastapi import FastAPI
+import json
+from typing import Annotated, Optional, cast
+from fastapi import Body, FastAPI, HTTPException
 
 from dotenv import load_dotenv
-from google import genai
-from google.genai import types
-from starlette.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 
-from model import ClassifyMessage, TriageOutput
+from model import ClassifyMessages, TriageOutput
 from prompt import SYSTEM_PROMPT
-
-load_dotenv(override=True)
-
+from settings import setting
+from llm import ask_llm
 
 app = FastAPI()
 
-client = genai.Client()
-
-config = types.GenerateContentConfig(
-    system_instruction=SYSTEM_PROMPT,
-    response_mime_type="application/json",
-    response_schema=TriageOutput,
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=setting.ALLLOW_ORIGINS,
+    allow_credentials=False,
+    allow_methods=["POST"],
+    allow_headers=["*"],
 )
 
 
-def getLLMResponse(message: str):
-    response = client.models.generate_content(
-        model="gemini-2.5-flash", config=config, contents=message
+# only one call of api with content and direct long answer of 20 meesages in one parse
+# the average time of response is 12s for 20 messages list
+# for 15 messages 10s
+# for 10 messages 8.5s
+# for 30 messages 18s
+# for 25 messages 15s (one request tool 24s on gemini-2.5-flash)
+@app.post("/api/classify/batch/")
+def classify_batch(messages: Annotated[ClassifyMessages, Body(...)]):
+    result = cast(
+        list[TriageOutput],
+        ask_llm(
+            data={"messages": messages.messages},
+        ),
     )
-    return response
 
-
-@app.post("/api/classify/", response_model=TriageOutput)
-def classify(message: ClassifyMessage):
-    try:
-        response = getLLMResponse(message.message)
-        if response.parsed is None:  # direct validation of schema by genai+pydantic
-            return JSONResponse(
-                status_code=502,
-                content={
-                    "success": False,
-                    "message": "gemini output is not based on schema and invalid",
-                    "raw_output": response.text,
-                },
-            )
-
-        return response.parsed
-    except Exception as e:
-        return JSONResponse(
-            status_code=500,
-            content={
-                "success": False,
-                "message": "Classification failed.",
-                "error": str(e),
+    if len(result) != len(messages.messages):
+        raise HTTPException(
+            status_code=502,
+            detail={
+                "message": "Gemini returned wrong number of results.",
+                "expected": len(messages.messages),
+                "got": len(result),
             },
         )
+
+    return {
+        "total": len(result),
+        "results": [item.model_dump() for item in result],
+    }
