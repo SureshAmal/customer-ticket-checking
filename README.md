@@ -2,7 +2,7 @@
 
 ## How to run this project 
 clone the repo 
-python -m http.server 3000
+
 ### if using UV
 cd into the project folder 
 do
