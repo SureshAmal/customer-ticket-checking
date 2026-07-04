@@ -1,12 +1,9 @@
-import json
-from typing import Annotated, Optional, cast
+from typing import Annotated, cast
 from fastapi import Body, FastAPI, HTTPException
 
-from dotenv import load_dotenv
 from fastapi.middleware.cors import CORSMiddleware
 
 from model import ClassifyMessages, TriageOutput
-from prompt import SYSTEM_PROMPT
 from settings import setting
 from llm import ask_llm
 

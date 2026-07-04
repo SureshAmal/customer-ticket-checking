@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Batch Classifier</title>
+  <link href="https://cdn.jsdelivr.net/npm/beercss@4.0.23/dist/cdn/beer.min.css" rel="stylesheet">
+  <link href="https://unpkg.com/tabulator-tables@6.5.0/dist/css/tabulator.min.css" rel="stylesheet">
+  <link href="styles.css" rel="stylesheet">
+  <script src="https://unpkg.com/tabulator-tables@6.5.0/dist/js/tabulator.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@6/dist/echarts.min.js"></script>
+</head>
+
+<body class="dark" data-theme="dark">
+  <select id="themeSelect" aria-label="Theme">
+    <option value="light">Light</option>
+    <option value="dark">Dark</option>
+  </select>
+  <main id="appShell">
+    <section id="controls">
+      <h1>Customer Ticket Classifier</h1>
+      <label for="messageInput">Message</label>
+      <input id="messageInput" class="border" type="text" autocomplete="off" enterkeyhint="done"
+        placeholder="Type one message and press Enter">
+      <button id="addMessage" class="border" type="button">Add</button>
+      <button id="classify" class="primary" type="button">Classify</button>
+      <ol id="messageList" class="border"></ol>
+      <p id="messageCount" class="small-text">0 / 30 messages</p>
+    </section>
+    <section id="resultsPanel">
+      <p id="status" class="small-text">Ready</p>
+      <div id="resultsTable"></div>
+      <div id="loadingOverlay" hidden>
+        <progress class="circle large curvy4" aria-label="Classifying messages"></progress>
+      </div>
+      <ul id="resultsList"></ul>
+      <div id="analytics">
+        <div id="categoryChart" class="chart"></div>
+        <div id="priorityChart" class="chart"></div>
+        <div id="flagsChart" class="chart"></div>
+      </div>
+    </section>
+  </main>
+  <script type="module" src="script.js"></script>
+</body>
+
+</html>
